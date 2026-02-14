@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import type { Game } from './types';
+import type { Game, ChaosTicketResponse } from './types';
 import { fetchChaosGames } from './api';
 import { ChaosMeter } from './components/ChaosMeter';
 import { CollapseVisualizer } from './components/CollapseVisualizer';
 import { GameCards } from './components/GameCards';
 import { LiveFeed } from './components/LiveFeed';
+import { TicketInput } from './components/TicketInput';
+import { TicketInsight } from './components/TicketInsight';
 import './App.css';
 
 export const App: React.FC = () => {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>();
+  const [ticketResponse, setTicketResponse] = useState<ChaosTicketResponse>();
+  const [ticketError, setTicketError] = useState<string>();
 
   useEffect(() => {
     const loadGames = async () => {
@@ -54,10 +58,28 @@ export const App: React.FC = () => {
 
       <main className="app-content">
         <div className="dashboard-grid">
+          {/* Ticket Input Section */}
+          <div className="ticket-section">
+            <TicketInput 
+              onSubmit={(response) => {
+                setTicketResponse(response);
+                setTicketError(undefined);
+              }}
+              onError={(error) => {
+                setTicketError(error);
+              }}
+            />
+          </div>
+
+          {/* Ticket Insight Section */}
+          <div className="insight-section">
+            <TicketInsight data={ticketResponse} />
+          </div>
+
           {/* Top metrics row */}
           <div className="metrics-row">
-            <ChaosMeter chaosScore={avgChaos} />
-            <CollapseVisualizer collapseRisk={avgCollapseRisk} />
+            <ChaosMeter chaosScore={ticketResponse?.chaosScore ?? avgChaos} />
+            <CollapseVisualizer collapseRisk={ticketResponse?.collapseRisk ?? avgCollapseRisk} />
           </div>
 
           {/* Games section */}

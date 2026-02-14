@@ -2,7 +2,7 @@
  * API client to communicate with FastAPI backend
  */
 
-import type { Game, ApiResponse } from './types';
+import type { Game, ApiResponse, ChaosTicketRequest, ChaosTicketResponse } from './types';
 
 const API_BASE_URL = "https://studious-train-r49xxjxggxpgf5jwq-8000.app.github.dev";
 
@@ -85,6 +85,31 @@ export async function fetchChaosGames(): Promise<ApiResponse<Game[]>> {
     return { success: true, data };
   } catch (error) {
     console.error("Failed to fetch chaos games:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Unknown error" 
+    };
+  }
+}
+/**
+ * Submit a chaos ticket and get response with chaos metrics
+ */
+export async function submitChaosTicket(ticket: ChaosTicketRequest): Promise<ApiResponse<ChaosTicketResponse>> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/chaos-ticket`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(ticket),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error("Failed to submit chaos ticket:", error);
     return { 
       success: false, 
       error: error instanceof Error ? error.message : "Unknown error" 
