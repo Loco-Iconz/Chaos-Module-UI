@@ -2,15 +2,9 @@
  * API client to communicate with FastAPI backend
  */
 
-import { Game, ApiResponse } from './types';
+import type { Game, ApiResponse } from './types';
 
 const API_BASE_URL = "https://studious-train-r49xxjxggxpgf5jwq-8000.app.github.dev";
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
 
 /**
  * Test the connection to the backend
@@ -37,7 +31,7 @@ export async function healthCheck(): Promise<ApiResponse<any>> {
  */
 export async function fetchChaosData(): Promise<ApiResponse<any>> {
   try {
-    const response = await fetch(`${API_BASE_URL}/chaos`);
+    const response = await fetch(`${API_BASE_URL}/api/health`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -57,7 +51,7 @@ export async function fetchChaosData(): Promise<ApiResponse<any>> {
  */
 export async function testChaos(testData: any): Promise<ApiResponse<any>> {
   try {
-    const response = await fetch(`${API_BASE_URL}/chaos/test`, {
+    const response = await fetch(`${API_BASE_URL}/api/chaos/test`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -71,6 +65,26 @@ export async function testChaos(testData: any): Promise<ApiResponse<any>> {
     return { success: true, data };
   } catch (error) {
     console.error("Chaos test failed:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Unknown error" 
+    };
+  }
+}
+
+/**
+ * Fetch game data with chaos scores from backend
+ */
+export async function fetchChaosGames(): Promise<ApiResponse<Game[]>> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/chaos`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error("Failed to fetch chaos games:", error);
     return { 
       success: false, 
       error: error instanceof Error ? error.message : "Unknown error" 
