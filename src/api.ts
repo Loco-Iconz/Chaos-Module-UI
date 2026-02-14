@@ -2,6 +2,8 @@
  * API client to communicate with FastAPI backend
  */
 
+import { Game, ApiResponse } from './types';
+
 const API_BASE_URL = "https://studious-train-r49xxjxggxpgf5jwq-8000.app.github.dev";
 
 export interface ApiResponse<T> {
